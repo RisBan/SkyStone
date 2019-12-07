@@ -33,6 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -83,9 +85,16 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * is explained below.
  */
 
-@TeleOp(name="SKYSTONE Vuforia Nav Webcam", group ="Concept")
+@TeleOp(name="Locate Position", group ="Concept")
 
 public class LocatePosition extends LinearOpMode {
+
+    // Declare OpMode members.
+    private ElapsedTime runtime = new ElapsedTime();
+    DcMotor frontRight = null;
+    DcMotor frontLeft = null;
+    DcMotor backLeft = null;
+    DcMotor backRight = null;
 
     // IMPORTANT: If you are using a USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
@@ -140,6 +149,24 @@ public class LocatePosition extends LinearOpMode {
     private float phoneZRotate    = 0;
 
     @Override public void runOpMode() {
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight  = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight  = hardwareMap.get(DcMotor.class, "frontRight");
+
+
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+
         /*
          * Retrieve the camera we are to use.
          */
@@ -329,7 +356,7 @@ public class LocatePosition extends LinearOpMode {
         // Tap the preview window to receive a fresh image.
 
         targetsSkyStone.activate();
-        while (!isStopRequested()) {
+        while (opModeIsActive()) {
 
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
@@ -363,6 +390,32 @@ public class LocatePosition extends LinearOpMode {
                 telemetry.addData("Visible Target", "none");
             }
             telemetry.update();
+
+            double lx = gamepad1.left_stick_x;
+            double ly = -gamepad1.left_stick_y;
+
+            double rx = gamepad1.right_stick_x;
+            double ry = -gamepad1.right_stick_y;
+
+
+            // Tank Mode uses one stick to control each wheel.
+            // - This requires no math, but it is hard to drive forward slowly and keep straight.
+            // leftPower  = -gamepad1.left_stick_y ;
+            // rightPower = -gamepad1.right_stick_y ;
+            /*
+            fl = ly + rx + lx
+            bl = ly + rx - lx
+            fr = ly - rx - lx
+            br = ly - rx + lx
+             */
+
+            double s = .5;
+
+            // Send calculated power to wheels
+            frontLeft.setPower  (s * Range.clip(ly + rx + lx, -1.0, 1.0));
+            backLeft.setPower   (s * Range.clip(ly + rx - lx, -1.0, 1.0));
+            frontRight.setPower (s * Range.clip(ly - rx - lx, -1.0, 1.0));
+            backRight.setPower  (s * Range.clip(ly - rx + lx, -1.0, 1.0));
         }
 
         // Disable Tracking when we are done;
