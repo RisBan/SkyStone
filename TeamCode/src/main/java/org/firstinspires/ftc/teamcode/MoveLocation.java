@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -93,7 +94,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * is explained below.
  */
 
-@TeleOp(name="SKYSTONE Vuforia Nav Webcam", group ="Concept")
+@TeleOp(name="Move Location", group ="Concept")
 
 public class MoveLocation extends LinearOpMode {
 
@@ -137,6 +138,15 @@ public class MoveLocation extends LinearOpMode {
     // Class Members
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
+
+    //auto-drive
+    static final double ENCODER_CPR_40 = 1120;
+    static final double WHEEL_DIAMETER_INCHES = 4.0;
+    static final double WHEEL_CPI = ENCODER_CPR_40/(WHEEL_DIAMETER_INCHES*Math.PI);
+    static final double COUNTS_PER_MOTOR_REV = 1440;
+    static final double DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * Math.PI);
 
     /**
      * This is the webcam we are to use. As with other hardware devices such as motors and
@@ -364,8 +374,6 @@ public class MoveLocation extends LinearOpMode {
         // To restore the normal opmode structure, just un-comment the following line:
 
         waitForStart();
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
@@ -398,9 +406,14 @@ public class MoveLocation extends LinearOpMode {
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
 
+                double x_value = translation.get(0);
+                double y_value = translation.get(1);
+
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+
+                double relativeHeading = rotation.thirdAngle;
             }
             else {
                 telemetry.addData("Visible Target", "none");
@@ -415,16 +428,21 @@ public class MoveLocation extends LinearOpMode {
         targetsSkyStone.deactivate();
     }
 
-    void moveThatRobot(double old_x, double old_y, double new_x, double new_y) {
-        double x_move = Math.abs(new_x - old_x);
-        double y_move = Math.abs(new_y - old_y);
 
-    }
-    String formatDegrees(double degrees){
-        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
-    }
 
-    String formatAngle(AngleUnit angleUnit, double angle) {
-        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    void moveThatRobot(double rotation, double old_x, double old_y, double new_x, double new_y) {
+
+
+        double distance = Math.sqrt(Math.pow((new_x-old_x)+(new_y-old_y),2));
+        int newFRTarget = frontRight.getCurrentPosition() + (int)(distance*COUNTS_PER_INCH);
+        int newBRTarget = backRight.getCurrentPosition() + (int)(distance*COUNTS_PER_INCH);
+        int newFLTarget = frontLeft.getCurrentPosition() + (int)(distance*COUNTS_PER_INCH);
+        int newBLTarget = backLeft.getCurrentPosition() + (int)(distance*COUNTS_PER_INCH);
+
+        frontRight.setTargetPosition(newFRTarget);
+        frontLeft.setTargetPosition(newFLTarget);
+        backRight.setTargetPosition(newBRTarget);
+        backLeft.setTargetPosition(newBLTarget);
+
     }
 }
