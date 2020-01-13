@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -19,6 +20,9 @@ public class MechanumTeleOp extends LinearOpMode{
         DcMotor frontLeft = null;
         DcMotor backLeft = null;
         DcMotor backRight = null;
+        Servo tail = null;
+        //Servo claw = null;
+        ColorSensor color;
 
 
 
@@ -34,6 +38,9 @@ public class MechanumTeleOp extends LinearOpMode{
             backRight  = hardwareMap.get(DcMotor.class, "backRight");
             frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
             frontRight  = hardwareMap.get(DcMotor.class, "frontRight");
+            tail = hardwareMap.get(Servo.class, "tail");
+            color = hardwareMap.get(ColorSensor.class, "color");
+            //claw = hardwareMap.get(Servo.class, "claw");
 
 
 
@@ -53,7 +60,6 @@ public class MechanumTeleOp extends LinearOpMode{
             // run until the end of the match (driver presses STOP)
             while (opModeIsActive()) {
 
-
                 double lx = gamepad1.left_stick_x;
                 double ly = -gamepad1.left_stick_y;
 
@@ -72,13 +78,62 @@ public class MechanumTeleOp extends LinearOpMode{
             br = ly - rx + lx
              */
 
-                double s = .5;
+                double s = .8;
 
                 // Send calculated power to wheels
                 frontLeft.setPower  (s * Range.clip(ly + rx + lx, -1.0, 1.0));
                 backLeft.setPower   (s * Range.clip(ly + rx - lx, -1.0, 1.0));
                 frontRight.setPower (s * Range.clip(ly - rx - lx, -1.0, 1.0));
                 backRight.setPower  (s * Range.clip(ly - rx + lx, -1.0, 1.0));
+
+                if (gamepad1.dpad_down) {
+                    tail.setPosition(0.7);
+                }
+                else if (gamepad1.dpad_up) {
+                    tail.setPosition(0.2);
+                }
+
+                /*if (gamepad1.y) {
+                    claw.setPosition(0.9);
+                }
+                else if (gamepad1.a) {
+                    claw.setPosition(0.0);
+                }*/
+
+                double red = color.red();
+                double blue = color.blue();
+                double green = color.green();
+                double alpha = color.alpha();
+
+                telemetry.addData("Red:", red);
+                telemetry.addData("Blue", blue);
+                telemetry.addData("Green:", green);
+                telemetry.addData("Alpha:", alpha);
+
+/*                if (gamepad1.y) {
+                    frontRight.setPower(0.5);
+                    frontLeft.setPower(0.0);
+                    backRight.setPower(0.0);
+                    backLeft.setPower(0.0);
+                }
+                else if (gamepad1.b) {
+                    frontRight.setPower(0.0);
+                    frontLeft.setPower(0.5);
+                    backRight.setPower(0.0);
+                    backLeft.setPower(0.0);
+                }
+                else if (gamepad1.a) {
+                    frontRight.setPower(0.0);
+                    frontLeft.setPower(0.0);
+                    backRight.setPower(0.5);
+                    backLeft.setPower(0.0);
+                }
+                else if (gamepad1.x) {
+                    frontRight.setPower(0.0);
+                    frontLeft.setPower(0.0);
+                    backRight.setPower(0.0);
+                    backLeft.setPower(0.5);
+                }*/
 
 
 
