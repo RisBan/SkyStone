@@ -43,11 +43,11 @@ public class Hardware {
     //WebcamName webcamName = null;
     BNO055IMU imu;
     ColorSensor color;
-    public Servo claw = null;
-    public DcMotor wrist = null;
+    public Servo finger = null;
+    public Servo wrist = null;
+    public DcMotor elbow = null;
     public DcMotor arm = null;
     public Servo tail = null;
-    //public DcMotor lift = null;
 
     //IMU Constants
     Orientation ANGLES;
@@ -99,6 +99,19 @@ public class Hardware {
             (WHEEL_DIAMETER_INCHES * Math.PI);
     public int count = 0;
 
+    //Arm Constants
+    static final double WRIST_PICK = 0.45;
+    static final double WRIST_ONE = 0.3;
+    static final double WRIST_TWO = 0.15;
+    static final double WRIST_THREE = 0.0;
+
+    static final double FINGER_OPEN = 0.5;
+    static final double FINGER_CLOSED = 0.15;
+    static final double FINGER_CAPSTONE = 0.2;
+
+    static final double TAIL_UP = 0.78;
+    static final double TAIL_DOWN = 0.35;
+
     /*Local OpMode Members*/
     HardwareMap hwMap = null;
 
@@ -112,18 +125,32 @@ public class Hardware {
         // Save reference to Hardware map
         hwMap = aHwMap;
 
-        // Define and Initialize Motors
+        // Define and Initialize Motors and Servos
         frontRight = hwMap.get(DcMotor.class, "frontRight");
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
         backRight = hwMap.get(DcMotor.class, "backRight");
         backLeft = hwMap.get(DcMotor.class,"backLeft");
         tail = hwMap.get(Servo.class, "tail");
+        arm = hwMap.get(DcMotor.class, "arm");
+        elbow = hwMap.get(DcMotor.class, "elbow");
+        wrist = hwMap.get(Servo.class,"wrist");
+        finger = hwMap.get(Servo.class,"finger");
 
         //Set robot directions
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
+
+        //Set Elbow Behavior
+        elbow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elbow.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        //Set Arm Behavior
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void autoInit(HardwareMap otherHwMap) {
@@ -141,7 +168,11 @@ public class Hardware {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
 
-        //lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elbow.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void initIMU() {
@@ -310,5 +341,12 @@ public class Hardware {
         LAST_ANGLE = ANGLES;
 
         return GLOBAL_ANGLE;
+    }
+
+    public void pickUp () {
+
+        finger.setPosition(FINGER_OPEN);
+        wrist.setPosition(WRIST_PICK);
+        finger.setPosition(FINGER_CLOSED);
     }
 }

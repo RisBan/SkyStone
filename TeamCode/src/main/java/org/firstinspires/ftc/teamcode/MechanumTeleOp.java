@@ -93,13 +93,6 @@ public class MechanumTeleOp extends LinearOpMode{
                     tail.setPosition(0.2);
                 }
 
-                /*if (gamepad1.y) {
-                    claw.setPosition(0.9);
-                }
-                else if (gamepad1.a) {
-                    claw.setPosition(0.0);
-                }*/
-
                 double red = color.red();
                 double blue = color.blue();
                 double green = color.green();
