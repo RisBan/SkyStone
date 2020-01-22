@@ -14,48 +14,18 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="Mecanum OpMode", group="Linear Opmode")
 public class MechanumTeleOp extends LinearOpMode{
 
-        // Declare OpMode members.
-        private ElapsedTime runtime = new ElapsedTime();
-        DcMotor frontRight = null;
-        DcMotor frontLeft = null;
-        DcMotor backLeft = null;
-        DcMotor backRight = null;
-        Servo tail = null;
-        //Servo claw = null;
-        ColorSensor color;
+        Hardware robot = new Hardware();
 
-
-
-        @Override
         public void runOpMode() {
+
+            robot.teleInit(hardwareMap);
+
             telemetry.addData("Status", "Initialized");
             telemetry.update();
 
-            // Initialize the hardware variables. Note that the strings used here as parameters
-            // to 'get' must correspond to the names assigned during the robot configuration
-            // step (using the FTC Robot Controller app on the phone).
-            backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-            backRight  = hardwareMap.get(DcMotor.class, "backRight");
-            frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
-            frontRight  = hardwareMap.get(DcMotor.class, "frontRight");
-            tail = hardwareMap.get(Servo.class, "tail");
-            color = hardwareMap.get(ColorSensor.class, "color");
-            //claw = hardwareMap.get(Servo.class, "claw");
-
-
-
-            // Most robots need the motor on one side to be reversed to drive forward
-            // Reverse the motor that runs backwards when connected directly to the battery
-            backLeft.setDirection(DcMotor.Direction.REVERSE);
-            backRight.setDirection(DcMotor.Direction.FORWARD);
-            frontLeft.setDirection(DcMotor.Direction.REVERSE);
-            frontRight.setDirection(DcMotor.Direction.FORWARD);
-
-
-
             // Wait for the game to start (driver presses PLAY)
             waitForStart();
-            runtime.reset();
+            robot.runtime.reset();
 
             // run until the end of the match (driver presses STOP)
             while (opModeIsActive()) {
@@ -81,19 +51,63 @@ public class MechanumTeleOp extends LinearOpMode{
                 double s = .8;
 
                 // Send calculated power to wheels
-                frontLeft.setPower  (s * Range.clip(ly + rx + lx, -1.0, 1.0));
-                backLeft.setPower   (s * Range.clip(ly + rx - lx, -1.0, 1.0));
-                frontRight.setPower (s * Range.clip(ly - rx - lx, -1.0, 1.0));
-                backRight.setPower  (s * Range.clip(ly - rx + lx, -1.0, 1.0));
+                robot.frontLeft.setPower  (s * Range.clip(ly + rx + lx, -1.0, 1.0));
+                robot.backLeft.setPower   (s * Range.clip(ly + rx - lx, -1.0, 1.0));
+                robot.frontRight.setPower (s * Range.clip(ly - rx - lx, -1.0, 1.0));
+                robot.backRight.setPower  (s * Range.clip(ly - rx + lx, -1.0, 1.0));
 
+                //Tail controls
                 if (gamepad1.dpad_down) {
-                    tail.setPosition(0.7);
+                    robot.tail.setPosition(robot.TAIL_DOWN);
                 }
                 else if (gamepad1.dpad_up) {
-                    tail.setPosition(0.2);
+                    robot.tail.setPosition(robot.TAIL_UP);
                 }
 
-                double red = color.red();
+                //Arm Controls
+                double armPower = gamepad2.left_stick_y;
+                if ((robot.ARM_BOTTOM_LIMIT < robot.arm.getCurrentPosition()) && (robot.arm.getCurrentPosition() < robot.ARM_TOP_LIMIT)) {
+                    robot.arm.setPower(armPower*0.7);
+                }
+                else {
+                    robot.arm.setPower(0);
+                }
+
+                //Elbow Controls
+                if (gamepad2.right_stick_y > 0.1) {
+                    robot.elbow.setPower(gamepad2.right_stick_y * 0.5);
+                }
+                else if (gamepad2.right_stick_y < 0.1) {
+                    robot.elbow.setPower(gamepad2.right_stick_y *0.25);
+                }
+                else {
+                    robot.elbow.setPower(0.0);
+                }
+
+
+                //Wrist Controls
+                if (gamepad2.dpad_up) {
+                        robot.wrist.setPosition(robot.wrist.getPosition() + 0.05);
+                }
+                else if (gamepad1.dpad_down) {
+                        robot.wrist.setPosition(robot.wrist.getPosition() - 0.05);
+                }
+                else {
+                    robot.wrist.setPosition(robot.wrist.getPosition());
+                }
+
+                //Finger Controls
+                if (gamepad1.a) {
+                    robot.finger.setPosition(robot.FINGER_CLOSED);
+                }
+                else if (gamepad1.y) {
+                    robot.finger.setPosition(robot.FINGER_OPEN);
+                }
+                else if (gamepad1.b) {
+                    robot.finger.setPosition(robot.FINGER_CAPSTONE);
+                }
+
+                /*double red = color.red();
                 double blue = color.blue();
                 double green = color.green();
                 double alpha = color.alpha();
@@ -101,7 +115,7 @@ public class MechanumTeleOp extends LinearOpMode{
                 telemetry.addData("Red:", red);
                 telemetry.addData("Blue", blue);
                 telemetry.addData("Green:", green);
-                telemetry.addData("Alpha:", alpha);
+                telemetry.addData("Alpha:", alpha); */
 
 /*                if (gamepad1.y) {
                     frontRight.setPower(0.5);
@@ -127,13 +141,6 @@ public class MechanumTeleOp extends LinearOpMode{
                     backRight.setPower(0.0);
                     backLeft.setPower(0.5);
                 }*/
-
-
-
-                // Show the elapsed game time and wheel power.
-                telemetry.addData("Status", "Run Time: " + runtime.toString());
-                //telemetry.addData("Motors", "left (%.2f), right (%.2f)", motorPower, rightPower);
-                telemetry.update();
             }
         }
 }

@@ -54,6 +54,7 @@ public class Hardware {
     Orientation LAST_ANGLE = new Orientation();
     double GLOBAL_ANGLE;
     public ElapsedTime runtime = new ElapsedTime();
+    public ElapsedTime maxtime = new ElapsedTime();
 
     //Vuforia Constants
     private static final String VUFORIA_KEY =
@@ -91,6 +92,7 @@ public class Hardware {
 
     //Auto Drive Constants
     static final double ENCODER_CPR_40 = 1120;
+    static final double ENCODER_CPR_60 = 1680;
     static final double WHEEL_DIAMETER_INCHES = 4.0;
     static final double COUNTS_PER_MOTOR_REV = 1440;
     static final double WHEEL_CPI = ENCODER_CPR_40/(WHEEL_DIAMETER_INCHES*Math.PI);
@@ -101,16 +103,27 @@ public class Hardware {
 
     //Arm Constants
     static final double WRIST_PICK = 0.45;
+    static final double WRIST_DRAG = 0.4;
     static final double WRIST_ONE = 0.3;
     static final double WRIST_TWO = 0.15;
     static final double WRIST_THREE = 0.0;
 
-    static final double FINGER_OPEN = 0.5;
-    static final double FINGER_CLOSED = 0.15;
-    static final double FINGER_CAPSTONE = 0.2;
+    static final double FINGER_OPEN = 1;
+    static final double FINGER_CLOSED = 0.5;
+    static final double FINGER_CAPSTONE = 0.4;
 
     static final double TAIL_UP = 0.78;
     static final double TAIL_DOWN = 0.35;
+
+    static final double ARM_PICK_INCH = 3.5;
+    static final double ARM_PINION_DIAMETER_INCHES = 20.8/25.4;
+    static final double ARM_PINION_CPI = ENCODER_CPR_40/(ARM_PINION_DIAMETER_INCHES*Math.PI);
+    static final double ARM_TOP_LIMIT = 5 * ARM_PINION_CPI;
+    static final double ARM_BOTTOM_LIMIT = 2 * ARM_PINION_CPI;
+    static final double MOVE_ARM = ARM_PICK_INCH * ARM_PINION_CPI;
+
+    static final double ELBOW_PICK = 130;
+    static final double ELBOW_OUT = 450;
 
     /*Local OpMode Members*/
     HardwareMap hwMap = null;
@@ -137,20 +150,20 @@ public class Hardware {
         finger = hwMap.get(Servo.class,"finger");
 
         //Set robot directions
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
 
         //Set Elbow Behavior
         elbow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elbow.setDirection(DcMotorSimple.Direction.REVERSE);
+        elbow.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //Set Arm Behavior
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        arm.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public void autoInit(HardwareMap otherHwMap) {
@@ -163,16 +176,18 @@ public class Hardware {
     public void teleInit (HardwareMap teleHwMap) {
         init(teleHwMap);
 
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
 
-        elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elbow.setDirection(DcMotorSimple.Direction.REVERSE);
+        elbow.setDirection(DcMotorSimple.Direction.FORWARD);
+        elbow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        elbow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        arm.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        wrist.scaleRange(0.0, 0.6);
     }
 
     public void initIMU() {
@@ -341,12 +356,5 @@ public class Hardware {
         LAST_ANGLE = ANGLES;
 
         return GLOBAL_ANGLE;
-    }
-
-    public void pickUp () {
-
-        finger.setPosition(FINGER_OPEN);
-        wrist.setPosition(WRIST_PICK);
-        finger.setPosition(FINGER_CLOSED);
     }
 }
