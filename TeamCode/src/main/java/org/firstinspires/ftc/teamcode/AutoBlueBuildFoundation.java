@@ -15,14 +15,28 @@ public class AutoBlueBuildFoundation extends LinearOpMode{
 
         waitForStart();
 
-        moveThatRobot(-26, -26, -26, -26, 0.7, 1000, 6000);
-        moveThatRobot(26, -20, -20, 26, 0.7, 1000, 6000);
+        //Code for fancy turning platform
+        /*moveThatRobot(-26,-26,-26,-26,0.7,500,6000);
+        moveThatRobot(10,-10,-10,10,0.7,1000,6000);
         robot.tail.setPosition(robot.TAIL_DOWN);
-        sleep(4000);
-        moveThatRobot(26, 26, 26, 26, 1, 1000, 6000);
+        sleep(1000);
+        moveThatRobot(10,10,10,10,0.7,1000,7000);
+        //moveThatRobot();*/
+
+        //Code for original moving platform
+        /*moveThatRobot(-26, -26, -26, -26, 0.7, 1000, 6000);
+        moveThatRobot(20, -20, -20, 20, 0.7, 1000, 6000);
+        robot.tail.setPosition(robot.TAIL_DOWN);
+        sleep(2000);
+        moveThatRobot(25.5, 25.5, 25.5, 25.5, 1, 1000, 6000);
         robot.tail.setPosition(robot.TAIL_UP);
-        rotateRobot(75, 0.7);
-        moveThatRobot(60, 60, 60, 60, 0.8, 1000, 5000);
+        rotateRobot(-80,0.3);
+        moveThatRobot(-48,-48,-48,-48,0.7,1000,20000);*/
+
+        //Random tests
+        //moveThatRobot(-60,60,60,-60,0.7,1000,15000);
+        rotateRobot(90, 0.8);
+        //moveThatRobot(53, 53, 53, 53, 0.8, 1000, 5000);
     }
 
     public void moveThatRobot (double frontRightDistance, double frontLeftDistance, double backRightDistance, double backLeftDistance, double speed, long timeout, int max) {
@@ -106,11 +120,14 @@ public class AutoBlueBuildFoundation extends LinearOpMode{
         }
         else return;
 
+        double factor = 1;
+        telemetry.addData("factor:", factor);
+        telemetry.update();
         // set power to rotate.
-        robot.backLeft.setPower(leftPower);
-        robot.frontLeft.setPower(leftPower);
-        robot.backRight.setPower(rightPower);
-        robot.frontRight.setPower(rightPower);
+        robot.backLeft.setPower(leftPower * factor);
+        robot.frontLeft.setPower(leftPower * factor);
+        robot.backRight.setPower(rightPower * factor);
+        robot.frontRight.setPower(rightPower * factor);
 
         // rotate until turn is completed.
         if (degrees < 0)
@@ -118,10 +135,40 @@ public class AutoBlueBuildFoundation extends LinearOpMode{
             // On right turn we have to get off zero first.
             while (opModeIsActive() && robot.getAngle() == 0) {}
 
-            while (opModeIsActive() && robot.getAngle() > degrees) {}
+            while (opModeIsActive() && robot.getAngle() > degrees) {
+                // set power to rotate.
+                robot.backLeft.setPower(leftPower*factor);
+                robot.frontLeft.setPower(leftPower*factor);
+                robot.backRight.setPower(rightPower*factor);
+                robot.frontRight.setPower(rightPower*factor);
+
+                if (factor>0.4) {
+                    factor = Math.abs((degrees-robot.getAngle())/degrees);
+                }
+                else {
+                    factor = 0.4;
+                }
+                telemetry.addData("factor:", factor);
+                telemetry.update();
+            }
         }
         else    // left turn.
-            while (opModeIsActive() && robot.getAngle() < degrees) {}
+            while (opModeIsActive() && robot.getAngle() < degrees) {
+                // set power to rotate.
+                robot.backLeft.setPower(leftPower*factor);
+                robot.frontLeft.setPower(leftPower*factor);
+                robot.backRight.setPower(rightPower*factor);
+                robot.frontRight.setPower(rightPower*factor);
+
+                if (factor>0.25) {
+                    factor = Math.abs((degrees-robot.getAngle())/degrees);
+                }
+                else {
+                    factor = 0.25;
+                }
+                telemetry.addData("factor:", factor);
+                telemetry.update();
+            }
 
         // turn the motors off.
         robot.frontRight.setPower(0);
@@ -136,5 +183,3 @@ public class AutoBlueBuildFoundation extends LinearOpMode{
         robot.resetAngle();
     }
 }
-
-

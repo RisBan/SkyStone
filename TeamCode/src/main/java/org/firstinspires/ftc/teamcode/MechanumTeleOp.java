@@ -75,10 +75,10 @@ public class MechanumTeleOp extends LinearOpMode{
 
                 //Elbow Controls
                 if (gamepad2.right_stick_y > 0.1) {
-                    robot.elbow.setPower(gamepad2.right_stick_y * 0.5);
+                    robot.elbow.setPower(gamepad2.right_stick_y*0.5);
                 }
                 else if (gamepad2.right_stick_y < 0.1) {
-                    robot.elbow.setPower(gamepad2.right_stick_y *0.25);
+                    robot.elbow.setPower(gamepad2.right_stick_y*0.5);
                 }
                 else {
                     robot.elbow.setPower(0.0);
@@ -87,10 +87,10 @@ public class MechanumTeleOp extends LinearOpMode{
 
                 //Wrist Controls
                 if (gamepad2.dpad_up) {
-                        robot.wrist.setPosition(robot.wrist.getPosition() + 0.05);
+                        robot.wrist.setPosition(robot.wrist.getPosition() + 0.02);
                 }
-                else if (gamepad1.dpad_down) {
-                        robot.wrist.setPosition(robot.wrist.getPosition() - 0.05);
+                else if (gamepad2.dpad_down) {
+                        robot.wrist.setPosition(robot.wrist.getPosition() - 0.02);
                 }
                 else {
                     robot.wrist.setPosition(robot.wrist.getPosition());
@@ -103,19 +103,17 @@ public class MechanumTeleOp extends LinearOpMode{
                 else if (gamepad1.y) {
                     robot.finger.setPosition(robot.FINGER_OPEN);
                 }
-                else if (gamepad1.b) {
-                    robot.finger.setPosition(robot.FINGER_CAPSTONE);
-                }
 
-                /*double red = color.red();
-                double blue = color.blue();
-                double green = color.green();
-                double alpha = color.alpha();
+                /*double red = robot.color.red();
+                double blue = robot.color.blue();
+                double green = robot.color.green();
+                double alpha = robot.color.alpha();
 
                 telemetry.addData("Red:", red);
                 telemetry.addData("Blue", blue);
                 telemetry.addData("Green:", green);
-                telemetry.addData("Alpha:", alpha); */
+                telemetry.addData("Alpha:", alpha);
+                telemetry.update();*/
 
 /*                if (gamepad1.y) {
                     frontRight.setPower(0.5);

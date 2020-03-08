@@ -20,37 +20,75 @@ public class AutoRedDepot extends LinearOpMode {
         waitForStart();
 
         //armOut();
-        moveThatRobot(28,28,28, 28, 0.9, 500, 7000);
+        //moveThatRobot(28,28,28, 28, 0.9, 500, 7000);
         //moveThatRobot(-2,2,2,-2,0.5,500);
 
+        moveThatRobot(30,-30,-30,30,0.7,500,10000);
+
         while (opModeIsActive() && robot.count <= 2) {
-            if ((0 < robot.color.red()) && (robot.color.red()< 25)) {
+            if ((0 < robot.color.red()) && (robot.color.red()< 20)) {
                 int red = robot.color.red();
                 telemetry.addData("Red:", red);
                 telemetry.update();
-                //armDown();
-                moveThatRobot(-4,-4,-4,-4,0.7,250, 2000);
-                rotateRobot(-75,0.7);
+                moveThatRobot(7,-7,-7,7,0.5,200,5000);
+                robot.hand.setPosition(robot.HAND_DOWN);
+                sleep(2000);
+                moveThatRobot(-10,10,10,-10,0.7,500,6000);
                 break;
             }
-            else if ((25 < robot.color.red())) {
+            else if ((20 < robot.color.red())) {
                 robot.count += 1;
                 int red = robot.color.red();
                 telemetry.addData("Red:", red);
                 telemetry.update();
-                moveThatRobot(11, -11,-11,11,1,1000, 2500);
-                moveThatRobot(3,3,3,3,0.5,500, 3000);
+                //moveThatRobot(-3,3,3,-3,0.5,1000,4000);
+                moveThatRobot(8, 8,8,8,1,1000, 2500);
             }
         }
 
-        moveThatRobot(72,72,72,72,0.8,1000, 10000);
-        rotateRobot(75,0.7);
-        rotateRobot(-165,0.7);
-        moveThatRobot(6,6,6,6,0.5,1000, 5000);
-        robot.tail.setPosition(robot.TAIL_DOWN);
-        moveThatRobot(-24,-24,-24,-24,0.7,1000, 5000);
+        if (robot.count == 0) {
+            robot.VARIABLE_MOTION = 66;
+            moveThatRobot(robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,0.8,1000,12000);
+            sleep(2000);
+            robot.hand.setPosition(robot.HAND_UP);
+            sleep(2000);
+            robot.VARIABLE_MOTION_2 = -robot.VARIABLE_MOTION - 24;
+            moveThatRobot(robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,0.8,1000,12000);
+            moveThatRobot(10,-10,-10,10,0.7,1000,10000);
+            robot.hand.setPosition(robot.HAND_DOWN);
+            moveThatRobot(-10,10,10,-10,0.7,1000,10000);
+            robot.VARIABLE_MOTION_3 = robot.VARIABLE_MOTION + 24;
+            moveThatRobot(robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3,0.8, 1000, 12000);
+            robot.hand.setPosition(robot.HAND_UP);
+        }
+        else if (robot.count == 1) {
+            robot.VARIABLE_MOTION = 57;
+            moveThatRobot(robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,0.8,1000,12000);
+            robot.hand.setPosition(robot.HAND_UP);
+            robot.VARIABLE_MOTION_2 = -robot.VARIABLE_MOTION - 24;
+            moveThatRobot(robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,0.8,1000,12000);
+            moveThatRobot(10,-10,-10,10,0.7,1000,10000);
+            robot.hand.setPosition(robot.HAND_DOWN);
+            moveThatRobot(-10,10,10,-10,0.7,1000,10000);
+            robot.VARIABLE_MOTION_3 = robot.VARIABLE_MOTION + 24;
+            moveThatRobot(robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3,0.8, 1000, 12000);
+            robot.hand.setPosition(robot.HAND_UP);
+        }
+        else if (robot.count == 2) {
+            robot.VARIABLE_MOTION = 50;
+            moveThatRobot(robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,robot.VARIABLE_MOTION,0.8,1000,12000);
+            robot.hand.setPosition(robot.HAND_UP);
+            robot.VARIABLE_MOTION_2 = -robot.VARIABLE_MOTION - 24;
+            moveThatRobot(robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,robot.VARIABLE_MOTION_2,0.8,1000,12000);
+            moveThatRobot(10,-10,-10,10,0.7,1000,10000);
+            robot.hand.setPosition(robot.HAND_DOWN);
+            moveThatRobot(-10,10,10,-10,0.7,1000,10000);
+            robot.VARIABLE_MOTION_3 = robot.VARIABLE_MOTION + 24;
+            moveThatRobot(robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3, robot.VARIABLE_MOTION_3,0.8, 1000, 12000);
+            robot.hand.setPosition(robot.HAND_UP);
+        }
 
-        //moveThatRobot(-24,-24,-24,-24,0.5,1000);
+        moveThatRobot(-10,-10,-10,-10,0.7,1000,12000);
     }
 
 
@@ -165,7 +203,7 @@ public class AutoRedDepot extends LinearOpMode {
 
     }
 
-    public void pickUp () {
+/*    public void pickUp () {
         robot.arm.setTargetPosition((int)(robot.MOVE_ARM));
         robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.arm.setPower(0.3);
@@ -190,9 +228,9 @@ public class AutoRedDepot extends LinearOpMode {
         robot.runtime.reset();
         while (opModeIsActive() && (robot.runtime.seconds() < 1.5)) {
         }
-    }
+    }*/
 
-    public void armOut () {
+/*    public void armOut () {
         robot.arm.setTargetPosition((int)(robot.MOVE_ARM));
         robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.arm.setPower(0.5);
@@ -212,9 +250,9 @@ public class AutoRedDepot extends LinearOpMode {
         robot.wrist.setPosition(robot.WRIST_PICK);
         robot.finger.setPosition(robot.FINGER_OPEN);
         robot.elbow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    }
+    }*/
 
-    public void armDown () {
+    public void handDown () {
         robot.elbow.setTargetPosition((int)(robot.ELBOW_PICK));
         robot.elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.elbow.setPower(0.4);

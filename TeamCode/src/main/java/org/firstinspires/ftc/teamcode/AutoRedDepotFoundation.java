@@ -15,7 +15,13 @@ public class AutoRedDepotFoundation extends LinearOpMode {
 
         waitForStart();
 
-        moveThatRobot(22,22,22,22,0.9,1000,5000);
+       /*sleep(4000);
+       rotateRobot(-90,0.3);
+       moveThatRobot(60,60,60,60,0.5,1000,15000);*/
+
+       moveThatRobot(40,-40,-40,40,0.5,1000,10000);
+
+        /* moveThatRobot(22,22,22,22,0.9,1000,5000);
         rotateRobot(-75,0.5);
         moveThatRobot(84,84,84,84,1,1000,15000);
         rotateRobot(-75,0.5);
@@ -26,7 +32,7 @@ public class AutoRedDepotFoundation extends LinearOpMode {
         robot.tail.setPosition(robot.TAIL_UP);
         moveThatRobot(48,-48,-48,48,0.7,1000,7000);
 
-
+*/
     }
 
     public void moveThatRobot (double frontRightDistance, double frontLeftDistance, double backRightDistance, double backLeftDistance, double speed, long timeout, int max) {
@@ -134,7 +140,7 @@ public class AutoRedDepotFoundation extends LinearOpMode {
         robot.backRight.setPower(0);
 
         // wait for rotation to stop.
-        sleep(1000);
+        sleep(500);
 
         // reset angle tracking on new heading.
         robot.resetAngle();

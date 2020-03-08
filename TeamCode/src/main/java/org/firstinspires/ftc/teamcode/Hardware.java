@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -48,6 +50,7 @@ public class Hardware {
     public DcMotor elbow = null;
     public DcMotor arm = null;
     public Servo tail = null;
+    public Servo hand = null;
 
     //IMU Constants
     Orientation ANGLES;
@@ -90,6 +93,13 @@ public class Hardware {
     final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
     final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
 
+    //Hand Constants
+    static final double HAND_DOWN = 0.2;
+    static final double HAND_UP = 0.9;
+    double VARIABLE_MOTION = 0.0;
+    double VARIABLE_MOTION_2 = 0.0;
+    double VARIABLE_MOTION_3 = 0.0;
+
     //Auto Drive Constants
     static final double ENCODER_CPR_40 = 1120;
     static final double ENCODER_CPR_60 = 1680;
@@ -108,12 +118,11 @@ public class Hardware {
     static final double WRIST_TWO = 0.15;
     static final double WRIST_THREE = 0.0;
 
-    static final double FINGER_OPEN = 1;
-    static final double FINGER_CLOSED = 0.5;
-    static final double FINGER_CAPSTONE = 0.4;
+    static final double FINGER_CLOSED = 0.8;
+    static final double FINGER_OPEN = 0.2;
 
     static final double TAIL_UP = 0.78;
-    static final double TAIL_DOWN = 0.35;
+    static final double TAIL_DOWN = 0.30;
 
     static final double ARM_PICK_INCH = 3.5;
     static final double ARM_PINION_DIAMETER_INCHES = 20.8/25.4;
@@ -148,6 +157,7 @@ public class Hardware {
         elbow = hwMap.get(DcMotor.class, "elbow");
         wrist = hwMap.get(Servo.class,"wrist");
         finger = hwMap.get(Servo.class,"finger");
+        hand = hwMap.get(Servo.class, "hand");
 
         //Set robot directions
         backLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -188,6 +198,8 @@ public class Hardware {
         arm.setDirection(DcMotorSimple.Direction.FORWARD);
 
         wrist.scaleRange(0.0, 0.6);
+
+        color = hwMap.get(ColorSensor.class, "color");
     }
 
     public void initIMU() {
